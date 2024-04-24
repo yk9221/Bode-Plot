@@ -1,0 +1,52 @@
+.calculator_gain, .calculator_phase {
+    width: 1000px;
+    height: 300px;
+    float: left;
+}
+
+.graph {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.graph:hover {
+    background-color: #45a049;
+}
+
+.inputs {
+    margin-left: 10px;
+    margin-right: 100px;
+    margin-top: 50px;
+    float: left;
+}
+
+input[type=text] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+input[type=text]:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+label {
+    font-size: 16px;
+    margin-bottom: 6px;
+}

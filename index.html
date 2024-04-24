@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bode Plot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+    <div class="inputs">
+        <div>
+            <label for="input1">K:</label>
+            <input type="text" class="input1" value="1">
+        </div>
+        <div>
+            <label for="input2">Numerator:</label>
+            <input type="text" class="input2" value="0">
+        </div>
+        <div>
+            <label for="input3">Denominator:</label>
+            <input type="text" class="input3" value="0">
+        </div>
+        <div>
+            <label for="input4">Numerator Corner Frequencies:</label>
+            <input type="text" class="input4" value="">
+        </div>
+        <div>
+            <label for="input5">Denominator Corner Frequencies:</label>
+            <input type="text" class="input5" value="">
+        </div>
+        <div>
+            <input type="checkbox" class="angle">
+            <label for="angle">Degrees</label>
+        </div>
+        <button class="graph" onclick="print_bode_plot()">Graph Bode Plot</button>
+    </div>
+    <div class="calculator_gain"></div>
+    <div class="calculator_phase"></div>
+    <script src="script.js"></script>
+</body>
+</html>
