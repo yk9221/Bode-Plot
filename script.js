@@ -6,7 +6,7 @@ var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".ca
 });
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
     expressionsCollapsed: true,
-    expressions: false,
+    // expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
@@ -19,7 +19,7 @@ calculator_phase.updateSettings({
     yAxisScale: "linear"
 });
 
-calculator_magnitude.observe("graphpaperBounds", function () {
+calculator_magnitude.observe("graphpaperBounds", function() {
     calculator_phase.setMathBounds({
         left: calculator_magnitude.graphpaperBounds.mathCoordinates.left,
         right: calculator_magnitude.graphpaperBounds.mathCoordinates.right,
@@ -28,7 +28,7 @@ calculator_magnitude.observe("graphpaperBounds", function () {
     });
 });
 
-calculator_phase.observe("graphpaperBounds", function () {
+calculator_phase.observe("graphpaperBounds", function() {
     calculator_magnitude.setMathBounds({
         left: calculator_phase.graphpaperBounds.mathCoordinates.left,
         right: calculator_phase.graphpaperBounds.mathCoordinates.right,
@@ -39,9 +39,10 @@ calculator_phase.observe("graphpaperBounds", function () {
 
 const checkbox_angle = document.querySelector(".angle");
 const checkbox_exact = document.querySelector(".exact");
+
 checkbox_angle.addEventListener("change", function() {
     print_bode_plot();
-    
+
     const checkbox_angle_text = document.querySelector(".angleUnit");
     if(checkbox_angle.checked) {
         checkbox_angle_text.textContent = "Currently in Degrees";
@@ -61,7 +62,6 @@ checkbox_exact.addEventListener("change", function() {
         checkbox_exact_text.textContent = "Approximate";
     }
 });
-
 document.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         print_bode_plot();
@@ -89,8 +89,8 @@ function print_bode_plot() {
     var K = values[0];
     values[1] = values[1].trim();
     values[2] = values[2].trim();
-    var w_c_num = values[1].trim() ? values[1].split(/[,\s]+/) : [];
-    var w_c_den = values[2].trim() ? values[2].split(/[,\s]+/) : [];
+    var w_c_num = values[1].trim() ? values[1].match(/(?:\[.*?\]|[^,\s]+)/g) : [];
+    var w_c_den = values[2].trim() ? values[2].match(/(?:\[.*?\]|[^,\s]+)/g) : [];
 
     var magnitude_expression_approximation = "g_{approximation}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
     var phase_expression_approximation = "p_{approximation}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
@@ -99,7 +99,21 @@ function print_bode_plot() {
     var phase_expression_exact = "p_{exact}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
     w_c_num.forEach(function(w_c) {
-        if(w_c == 0) {
+        if(w_c[0] == "[" && w_c[w_c.length - 1] == "]") {
+            w_c = w_c.substring(1, w_c.length - 1);
+            w_c = w_c.trim();
+            w_c_second_order = w_c.trim() ? w_c.split(/[,\s]+/) : [];
+
+            var w_n = Math.sqrt(w_c_second_order[2]);
+            var zeta = w_c_second_order[1] / (2 * w_n);
+
+            magnitude_expression_approximation += "\\left\\{x<" + Math.abs(w_n) + ":\\ 0,\\ x\\ge" + Math.abs(w_n) + ":\\ 40\\log\\left(\\frac{x}{" + Math.abs(w_n) + "}\\right)\\right\\}" + " + ";
+            phase_expression_approximation += "\\left\\{x<" + Math.abs(w_n/10) + ":\\ 0," + Math.abs(w_n/10) + "\\le x<" + Math.abs(w_n*10) + ":\\ \\frac{" + Math.sign(w_n) + "\\cdot \\pi}{2}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_n/10) + "\\right),\\ x\\ge" + Math.abs(w_n*10) + ": " + Math.sign(w_n) + "\\cdot \\pi\\right\\}" + " + ";
+
+            magnitude_expression_exact += "10\\log\\left(\\left(1-\\frac{x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)^{2}+\\frac{4\\left(" + zeta + "\\right)^{2}x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)" + " + ";
+            phase_expression_exact += "\\left\\{0\\le x \\le" + w_n + "\\ :\\ \\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + (w_n) + "^{2}}}\\right),\\ x>" + w_n + "\\ :\\ \\left(\\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + w_n + "^{2}}}\\right)+\\pi\\right)\\right\\}" + " + ";
+        }
+        else if(w_c == 0) {
             magnitude_expression_approximation += "20\\log(x)" + " + ";
             phase_expression_approximation += "\\frac{\\pi}{2}" + " + ";
 
@@ -115,7 +129,22 @@ function print_bode_plot() {
         }
     });
     w_c_den.forEach(function(w_c) {
-        if(w_c == 0) {
+        if(w_c[0] == "[" && w_c[w_c.length - 1] == "]") {
+            w_c = w_c.substring(1, w_c.length - 1);
+            w_c = w_c.trim();
+            w_c_second_order = w_c.trim() ? w_c.split(/[,\s]+/) : [];
+
+            var w_n = Math.sqrt(w_c_second_order[2]);
+            var zeta = w_c_second_order[1] / (2 * w_n);
+
+            magnitude_expression_approximation += "\\left\\{x<" + Math.abs(w_n) + ":\\ 0,\\ x\\ge" + Math.abs(w_n) + ":\\ -40\\log\\left(\\frac{x}{" + Math.abs(w_n) + "}\\right)\\right\\}" + " + ";
+            phase_expression_approximation += "\\left\\{x<" + Math.abs(w_n/10) + ":\\ 0," + Math.abs(w_n/10) + "\\le x<" + Math.abs(w_n*10) + ":\\ \\frac{" + Math.sign(w_n) + "\\cdot -\\pi}{2}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_n/10) + "\\right),\\ x\\ge" + Math.abs(w_n*10) + ": " + Math.sign(w_n) + "\\cdot -\\pi\\right\\}" + " + ";
+            
+            magnitude_expression_exact += "-10\\log\\left(\\left(1-\\frac{x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)^{2}+\\frac{4\\left(" + zeta + "\\right)^{2}x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)" + " + ";
+            phase_expression_exact += "\\left\\{0\\le x\\le" + w_n + "\\ :\\ -\\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + (w_n) + "^{2}}}\\right),\\ x>" + w_n + "\\ :\\ -\\left(\\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + w_n + "^{2}}}\\right)+\\pi\\right)\\right\\}" + " + ";
+            console.log(phase_expression_exact)
+        }
+        else if(w_c == 0) {
             magnitude_expression_approximation += "-20\\log(x)" + " + ";
             phase_expression_approximation += "\\frac{-\\pi}{2}" + " + ";
 
@@ -211,7 +240,7 @@ function print_bode_plot() {
         var val_magnitude = calculator_magnitude.HelperExpression({ latex: "g_{" + accuracyStatus + "}(" + val + ")" });
         var val_phase = calculator_phase.HelperExpression({ latex: "p_{" + accuracyStatus + "}(" + val + ")" });
         const promise_magnitude = new Promise(resolve => {
-            val_magnitude.observe("numericValue", function () {
+            val_magnitude.observe("numericValue", function() {
                 if(val_magnitude.numericValue > max_y_magnitude) {
                     max_y_magnitude = val_magnitude.numericValue;
                 }
@@ -222,7 +251,8 @@ function print_bode_plot() {
             });
         });
         const promise_phase = new Promise(resolve => {
-            val_phase.observe("numericValue", function () {
+            val_phase.observe("numericValue", function() {
+                console.log(val, val_phase.numericValue);
                 if(val_phase.numericValue > max_y_phase) {
                     max_y_phase = val_phase.numericValue;
                 }
@@ -236,6 +266,12 @@ function print_bode_plot() {
     }
 
     w_c_num.forEach(function(w_c) {
+        if(w_c[0] == "[" && w_c[w_c.length - 1] == "]") {
+            w_c = w_c.substring(1, w_c.length - 1);
+            w_c_second_order = w_c.trim() ? w_c.split(/[,\s]+/) : [];
+            w_c = Math.sqrt(w_c_second_order[2]);
+        }
+
         find_x_bound(w_c);
 
         for(var i = 0; i < check.length; i++) {
@@ -254,6 +290,12 @@ function print_bode_plot() {
     });
 
     w_c_den.forEach(function(w_c) {
+        if(w_c[0] == "[" && w_c[w_c.length - 1] == "]") {
+            w_c = w_c.substring(1, w_c.length - 1);
+            w_c_second_order = w_c.trim() ? w_c.split(/[,\s]+/) : [];
+            w_c = Math.sqrt(w_c_second_order[2]);
+        }
+
         find_x_bound(w_c);
 
         for(var i = 0; i < check.length; i++) {
@@ -288,6 +330,7 @@ function print_bode_plot() {
     promises.push(promise_val_right_exact[1]);
 
     Promise.all(promises).then(() => {
+        console.log(min_y_phase, max_y_phase)
         var margin = 0.1;
         if(min_x === Infinity) {
             min_x = calculator_magnitude.graphpaperBounds.mathCoordinates.left*100;
