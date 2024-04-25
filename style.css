@@ -4,6 +4,15 @@
     float: left;
 }
 
+.calculator_phase {
+    margin: 50px 0px;
+}
+
+.calculators {
+    display: flex;
+    flex-direction: column;
+}
+
 .graph {
     background-color: #4CAF50;
     border: none;
