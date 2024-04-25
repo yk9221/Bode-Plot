@@ -175,20 +175,26 @@ function print_bode_plot() {
     w_c_num.forEach(function(w_c) {
         find_x_bound(w_c);
 
-        var promise_val = find_y_bound(w_c);
-        if(promise_val.length != 0) {
-            promises.push(promise_val[0]);
-            promises.push(promise_val[1]);
+        var check = [0.1, 1, 10];
+        for(var i = 0; i < 3; i++) {
+            var promise_val = find_y_bound(w_c * check[i]);
+            if(promise_val.length != 0) {
+                promises.push(promise_val[0]);
+                promises.push(promise_val[1]);
+            }
         }
     });
 
     w_c_den.forEach(function(w_c) {
         find_x_bound(w_c);
 
-        var promise_val = find_y_bound(w_c);
-        if(promise_val.length != 0) {
-            promises.push(promise_val[0]);
-            promises.push(promise_val[1]);
+        var check = [0.1, 1, 10];
+        for(var i = 0; i < 3; i++) {
+            var promise_val = find_y_bound(w_c * check[i]);
+            if(promise_val.length != 0) {
+                promises.push(promise_val[0]);
+                promises.push(promise_val[1]);
+            }
         }
     });
 
