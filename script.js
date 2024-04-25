@@ -98,7 +98,7 @@ function print_bode_plot() {
             phase_expression_approximation += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot \\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{" + Math.sign(w_c) + "\\cdot \\pi}{2}\\right\\}" + " + ";
 
             magnitude_expression_actual += "10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
-            phase_expression_actual += "\\arctan\\left(\\frac{x}{" + w_c + "}\\right)";
+            phase_expression_actual += "\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
         }
     });
     w_c_den.forEach(function(w_c) {
@@ -114,7 +114,7 @@ function print_bode_plot() {
             phase_expression_approximation += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{2}\\right\\}" + " + ";
 
             magnitude_expression_actual += "-10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
-            phase_expression_actual += "-\\arctan\\left(\\frac{x}{" + w_c + "}\\right)";
+            phase_expression_actual += "-\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
         }
     });
     
@@ -122,12 +122,15 @@ function print_bode_plot() {
     phase_expression_approximation = phase_expression_approximation.substring(0, phase_expression_approximation.length - 3);
 
     magnitude_expression_actual = magnitude_expression_actual.substring(0, magnitude_expression_actual.length - 3);
+    phase_expression_actual = phase_expression_actual.substring(0, phase_expression_actual.length - 3);
 
     if(checkbox.checked) {
-        phase_expression_approximation = phase_expression_approximation.slice(0, 23) + "(" + phase_expression_approximation.slice(23);
+        var equal_index = phase_expression_approximation.indexOf("=");
+        phase_expression_approximation = phase_expression_approximation.slice(0, equal_index + 2) + "(" + phase_expression_approximation.slice(equal_index + 2);
         phase_expression_approximation += ")\\cdot 180 / \\pi";
 
-        phase_expression_actual = phase_expression_actual.slice(0, 16) + "(" + phase_expression_actual.slice(16);
+        equal_index = phase_expression_actual.indexOf("=");
+        phase_expression_actual = phase_expression_actual.slice(0, equal_index + 2) + "(" + phase_expression_actual.slice(equal_index + 2);
         phase_expression_actual += ")\\cdot 180 / \\pi";
     }
 
