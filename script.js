@@ -7,7 +7,7 @@ var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".ca
 });
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
     expressionsCollapsed: true,
-    // expressions: false,
+    expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
