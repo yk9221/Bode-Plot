@@ -1,4 +1,3 @@
-const checkbox = document.querySelector(".angle");
 var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {
     expressionsCollapsed: true,
     expressions: false,
@@ -42,6 +41,7 @@ calculator_phase.observe("graphpaperBounds", function () {
     });
 });
 
+const checkbox = document.querySelector(".angle");
 checkbox.addEventListener("change", function() {
     const checkboxText = document.querySelector(".angleUnit");
     if(checkbox.checked) {
@@ -62,12 +62,12 @@ document.addEventListener("keyup", function(event) {
 function print_bode_plot() {
     const promises = [];
     var values = [];
-    for (var i = 1; i <= 3; i++) {
-        var value = document.querySelector(".input" + i).value;
-        if(i == 1 && value == "") {
-            value = "1";
+    var input_box = document.querySelectorAll(".input");
+    for (var i = 0; i < 3; i++) {
+        if(i == 0 && input_box[i].value == "") {
+            input_box[i].value = "1";
         }
-        values.push(value);
+        values.push(input_box[i].value);
     }
     max_x = -Infinity;
     min_x = Infinity;
