@@ -1,4 +1,4 @@
-.calculator_gain, .calculator_phase {
+.calculator_magnitude, .calculator_phase {
     width: 1000px;
     height: 300px;
     float: left;
