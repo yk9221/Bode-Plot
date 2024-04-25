@@ -1,24 +1,24 @@
 const checkbox = document.querySelector(".angle");
-var calculator_gain = Desmos.GraphingCalculator(document.querySelector(".calculator_gain"), {expressionsCollapsed: true});
+var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {expressionsCollapsed: true});
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {expressionsCollapsed: true});
-calculator_gain.updateSettings({ xAxisLabel: "x", yAxisLabel: "y", xAxisScale: "logarithmic", yAxisScale: "linear" });
+calculator_magnitude.updateSettings({ xAxisLabel: "x", yAxisLabel: "y", xAxisScale: "logarithmic", yAxisScale: "linear" });
 calculator_phase.updateSettings({ xAxisLabel: "x", yAxisLabel: "y", xAxisScale: "logarithmic", yAxisScale: "linear" });
 
-calculator_gain.observe("graphpaperBounds", function () {
+calculator_magnitude.observe("graphpaperBounds", function () {
     calculator_phase.setMathBounds({
-        left: calculator_gain.graphpaperBounds.mathCoordinates.left,
-        right: calculator_gain.graphpaperBounds.mathCoordinates.right,
+        left: calculator_magnitude.graphpaperBounds.mathCoordinates.left,
+        right: calculator_magnitude.graphpaperBounds.mathCoordinates.right,
         bottom: calculator_phase.graphpaperBounds.mathCoordinates.bottom,
         top: calculator_phase.graphpaperBounds.mathCoordinates.top
     });
 });
 
 calculator_phase.observe("graphpaperBounds", function () {
-    calculator_gain.setMathBounds({
+    calculator_magnitude.setMathBounds({
         left: calculator_phase.graphpaperBounds.mathCoordinates.left,
         right: calculator_phase.graphpaperBounds.mathCoordinates.right,
-        bottom: calculator_gain.graphpaperBounds.mathCoordinates.bottom,
-        top: calculator_gain.graphpaperBounds.mathCoordinates.top
+        bottom: calculator_magnitude.graphpaperBounds.mathCoordinates.bottom,
+        top: calculator_magnitude.graphpaperBounds.mathCoordinates.top
     });
 });
 
@@ -51,8 +51,8 @@ function print_bode_plot() {
     }
     max_x = -Infinity;
     min_x = Infinity;
-    max_y_gain = -Infinity;
-    min_y_gain = Infinity;
+    max_y_magnitude = -Infinity;
+    min_y_magnitude = Infinity;
     max_y_phase = -Infinity;
     min_y_phase = Infinity;
 
@@ -60,31 +60,31 @@ function print_bode_plot() {
     var w_c_num = values[1].trim() ? values[1].split(/[,\s]+/) : [];
     var w_c_den = values[2].trim() ? values[2].split(/[,\s]+/) : [];
 
-    var gain_expression = "g(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + "
+    var magnitude_expression = "g(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + "
     var phase_expression = "p(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
     w_c_num.forEach(function(w_c) {
         if(w_c == 0) {
-            gain_expression += "20\\log(x)" + " + ";
+            magnitude_expression += "20\\log(x)" + " + ";
             phase_expression += "\\frac{\\pi}{2}" + " + ";
         }
         else {
-            gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ 20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
+            magnitude_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ 20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
             phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{\\pi}{2}\\right\\}" + " + "
         }
     });
     w_c_den.forEach(function(w_c) {
         if(w_c == 0) {
-            gain_expression += "-20\\log(x)" + " + ";
+            magnitude_expression += "-20\\log(x)" + " + ";
             phase_expression += "\\frac{-\\pi}{2}" + " + ";
         }
         else {
-            gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ -20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
+            magnitude_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ -20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
             phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{-\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{-\\pi}{2}\\right\\}" + " + "
         }
     });
     
-    gain_expression = gain_expression.substring(0, gain_expression.length - 3);
+    magnitude_expression = magnitude_expression.substring(0, magnitude_expression.length - 3);
     phase_expression = phase_expression.substring(0, phase_expression.length - 3);
 
     if(checkbox.checked) {
@@ -92,7 +92,7 @@ function print_bode_plot() {
         phase_expression += ")\\cdot 180 / \\pi";
     }
 
-    calculator_gain.setExpression({ id: "gain", latex: gain_expression });
+    calculator_magnitude.setExpression({ id: "magnitude", latex: magnitude_expression });
     calculator_phase.setExpression({ id: "phase", latex: phase_expression });
 
     function find_x_bound(val) {
@@ -111,15 +111,15 @@ function print_bode_plot() {
         if(val == 0) {
             return [];
         }
-        var val_gain = calculator_gain.HelperExpression({ latex: "g(" + val + ")" });
+        var val_magnitude = calculator_magnitude.HelperExpression({ latex: "g(" + val + ")" });
         var val_phase = calculator_phase.HelperExpression({ latex: "p(" + val + ")" });
-        const promise_gain = new Promise(resolve => {
-            val_gain.observe("numericValue", function () {
-                if(val_gain.numericValue > max_y_gain) {
-                    max_y_gain = val_gain.numericValue;
+        const promise_magnitude = new Promise(resolve => {
+            val_magnitude.observe("numericValue", function () {
+                if(val_magnitude.numericValue > max_y_magnitude) {
+                    max_y_magnitude = val_magnitude.numericValue;
                 }
-                if(val_gain.numericValue < min_y_gain) {
-                    min_y_gain = val_gain.numericValue;
+                if(val_magnitude.numericValue < min_y_magnitude) {
+                    min_y_magnitude = val_magnitude.numericValue;
                 }
                 resolve();
             });
@@ -135,7 +135,7 @@ function print_bode_plot() {
                 resolve();
             });
         });
-        return [promise_gain, promise_phase];
+        return [promise_magnitude, promise_phase];
     }
 
     w_c_num.forEach(function(w_c) {
@@ -169,14 +169,14 @@ function print_bode_plot() {
     Promise.all(promises).then(() => {
         var margin = 0.1;
         if(min_x === Infinity) {
-            min_x = calculator_gain.graphpaperBounds.mathCoordinates.left*100;
+            min_x = calculator_magnitude.graphpaperBounds.mathCoordinates.left*100;
         }
         if(max_x === -Infinity) {
-            max_x = calculator_gain.graphpaperBounds.mathCoordinates.right/100;
+            max_x = calculator_magnitude.graphpaperBounds.mathCoordinates.right/100;
         }
-        if(min_y_gain == max_y_gain) {
-            min_y_gain = calculator_gain.graphpaperBounds.mathCoordinates.bottom;
-            max_y_gain = calculator_gain.graphpaperBounds.mathCoordinates.top;
+        if(min_y_magnitude == max_y_magnitude) {
+            min_y_magnitude = calculator_magnitude.graphpaperBounds.mathCoordinates.bottom;
+            max_y_magnitude = calculator_magnitude.graphpaperBounds.mathCoordinates.top;
             margin = 0;
         }
         if(min_y_phase == max_y_phase) {
@@ -185,11 +185,11 @@ function print_bode_plot() {
             margin = 0;
         }
 
-        calculator_gain.setMathBounds({
+        calculator_magnitude.setMathBounds({
             left: min_x/100,
             right: max_x*100,
-            bottom: min_y_gain - (max_y_gain - min_y_gain) * margin,
-            top: max_y_gain + (max_y_gain - min_y_gain) * margin
+            bottom: min_y_magnitude - (max_y_magnitude - min_y_magnitude) * margin,
+            top: max_y_magnitude + (max_y_magnitude - min_y_magnitude) * margin
         });
         calculator_phase.setMathBounds({
             left: min_x/100,
