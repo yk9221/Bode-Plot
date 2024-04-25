@@ -1,8 +1,28 @@
 const checkbox = document.querySelector(".angle");
-var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {expressionsCollapsed: true});
-var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {expressionsCollapsed: true});
-calculator_magnitude.updateSettings({ xAxisLabel: "x", yAxisLabel: "y", xAxisScale: "logarithmic", yAxisScale: "linear" });
-calculator_phase.updateSettings({ xAxisLabel: "x", yAxisLabel: "y", xAxisScale: "logarithmic", yAxisScale: "linear" });
+var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {
+    expressionsCollapsed: true,
+    expressions: false,
+    settingsMenu: false,
+    zoomButtons: false
+});
+var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
+    expressionsCollapsed: true,
+    expressions: false,
+    settingsMenu: false,
+    zoomButtons: false
+});
+calculator_magnitude.updateSettings({
+    xAxisLabel: "log(w)",
+    yAxisLabel: "|L(iw)|dB",
+    xAxisScale: "logarithmic",
+    yAxisScale: "linear"
+});
+calculator_phase.updateSettings({
+    xAxisLabel: "log(w)",
+    yAxisLabel: "arg(L(iw))",
+    xAxisScale: "logarithmic",
+    yAxisScale: "linear"
+});
 
 calculator_magnitude.observe("graphpaperBounds", function () {
     calculator_phase.setMathBounds({
@@ -94,8 +114,14 @@ function print_bode_plot() {
         phase_expression += ")\\cdot 180 / \\pi";
     }
 
-    calculator_magnitude.setExpression({ id: "magnitude", latex: magnitude_expression });
-    calculator_phase.setExpression({ id: "phase", latex: phase_expression });
+    calculator_magnitude.setExpression({
+        id: "magnitude",
+        latex: magnitude_expression
+    });
+    calculator_phase.setExpression({
+        id: "phase",
+        latex: phase_expression
+    });
 
     function find_x_bound(val) {
         if(val == 0) {
