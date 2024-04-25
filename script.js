@@ -27,7 +27,7 @@ function print_bode_plot() {
     const promises = [];
     const margin = 0.1;
     var values = [];
-    for (var i = 1; i <= 5; i++) {
+    for (var i = 1; i <= 3; i++) {
         var value = document.querySelector(".input" + i).value;
         values.push(value);
     }
@@ -39,29 +39,31 @@ function print_bode_plot() {
     min_y_phase = Infinity;
 
     var K = values[0];
-    var n_num = values[1];
-    var n_den = values[2];
-    var w_c_num = values[3].trim() ? values[3].split(/[,\s]+/) : [];
-    var w_c_den = values[4].trim() ? values[4].split(/[,\s]+/) : [];
+    var w_c_num = values[1].trim() ? values[1].split(/[,\s]+/) : [];
+    var w_c_den = values[2].trim() ? values[2].split(/[,\s]+/) : [];
 
     var gain_expression = "g(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + "
     var phase_expression = "p(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
-    if(n_num != 0) {
-        gain_expression += n_num + "\\cdot 20\\log(x)" + " + ";
-        phase_expression += n_num + "\\cdot\\frac{\\pi}{2}" + " + ";
-    }
-    if(n_den != 0) {
-        gain_expression += n_den + "\\cdot -20\\log(x)" + " + ";
-        phase_expression += n_den + "\\cdot\\frac{-\\pi}{2}" + " + ";
-    }
     w_c_num.forEach(function(w_c) {
-        gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ 20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
-        phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{\\pi}{2}\\right\\}" + " + "
+        if(w_c == 0) {
+            gain_expression += "20\\log(x)" + " + ";
+            phase_expression += "\\frac{\\pi}{2}" + " + ";
+        }
+        else {
+            gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ 20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
+            phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{\\pi}{2}\\right\\}" + " + "
+        }
     });
     w_c_den.forEach(function(w_c) {
-        gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ -20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
-        phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{-\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{-\\pi}{2}\\right\\}" + " + "
+        if(w_c == 0) {
+            gain_expression += "-20\\log(x)" + " + ";
+            phase_expression += "\\frac{-\\pi}{2}" + " + ";
+        }
+        else {
+            gain_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ -20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
+            phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{-\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{-\\pi}{2}\\right\\}" + " + "
+        }
     });
     
     gain_expression = gain_expression.substring(0, gain_expression.length - 3);
@@ -72,12 +74,13 @@ function print_bode_plot() {
         phase_expression += ")\\cdot 180 / \\pi";
     }
 
-    
-    
     calculator_gain.setExpression({ id: "gain", latex: gain_expression });
     calculator_phase.setExpression({ id: "phase", latex: phase_expression });
 
     function find_x_bound(val) {
+        if(val == 0) {
+            return;
+        }
         if(val > max_x) {
             max_x = val;
         }
@@ -87,6 +90,9 @@ function print_bode_plot() {
     }
 
     function find_y_bound(val) {
+        if(val == 0) {
+            return [];
+        }
         var val_gain = calculator_gain.HelperExpression({ latex: "g(" + val + ")" });
         var val_phase = calculator_phase.HelperExpression({ latex: "p(" + val + ")" });
         const promise_gain = new Promise(resolve => {
@@ -118,16 +124,20 @@ function print_bode_plot() {
         find_x_bound(w_c);
 
         var promise_val = find_y_bound(w_c);
-        promises.push(promise_val[0]);
-        promises.push(promise_val[1]);
+        if(promise_val.length != 0) {
+            promises.push(promise_val[0]);
+            promises.push(promise_val[1]);
+        }
     });
 
     w_c_den.forEach(function(w_c) {
         find_x_bound(w_c);
 
         var promise_val = find_y_bound(w_c);
-        promises.push(promise_val[0]);
-        promises.push(promise_val[1]);
+        if(promise_val.length != 0) {
+            promises.push(promise_val[0]);
+            promises.push(promise_val[1]);
+        }
     });
 
     var promise_val_left = find_y_bound(min_x/100);
