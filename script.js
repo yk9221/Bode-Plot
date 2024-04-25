@@ -22,12 +22,31 @@ calculator_phase.observe("graphpaperBounds", function () {
     });
 });
 
+checkbox.addEventListener("change", function() {
+    const checkboxText = document.querySelector(".angleUnit");
+    if(checkbox.checked) {
+        checkboxText.textContent = "Currently in Degrees";
+    }
+    else {
+        checkboxText.textContent = "Currently in Radians";
+    }
+});
+
+document.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        print_bode_plot();
+    }
+});
+
 
 function print_bode_plot() {
     const promises = [];
     var values = [];
     for (var i = 1; i <= 3; i++) {
         var value = document.querySelector(".input" + i).value;
+        if(i == 1 && value == "") {
+            value = "1";
+        }
         values.push(value);
     }
     max_x = -Infinity;
