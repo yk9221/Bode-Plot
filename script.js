@@ -7,7 +7,7 @@ var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".ca
 });
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
     expressionsCollapsed: true,
-    expressions: false,
+    // expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
@@ -82,7 +82,7 @@ function print_bode_plot() {
     var w_c_num = values[1].trim() ? values[1].split(/[,\s]+/) : [];
     var w_c_den = values[2].trim() ? values[2].split(/[,\s]+/) : [];
 
-    var magnitude_expression = "g(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + "
+    var magnitude_expression = "g(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
     var phase_expression = "p(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
     w_c_num.forEach(function(w_c) {
@@ -91,8 +91,8 @@ function print_bode_plot() {
             phase_expression += "\\frac{\\pi}{2}" + " + ";
         }
         else {
-            magnitude_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ 20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
-            phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{\\pi}{2}\\right\\}" + " + "
+            magnitude_expression += "\\left\\{x<" + Math.abs(w_c) + ":\\ 0,\\ x\\ge"+ Math.abs(w_c) +":\\ 20\\log\\left(\\frac{x}{" + Math.abs(w_c) + "}\\right)\\right\\}" + " + ";
+            phase_expression += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot \\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{" + Math.sign(w_c) + "\\cdot \\pi}{2}\\right\\}" + " + ";
         }
     });
     w_c_den.forEach(function(w_c) {
@@ -101,8 +101,8 @@ function print_bode_plot() {
             phase_expression += "\\frac{-\\pi}{2}" + " + ";
         }
         else {
-            magnitude_expression += "\\left\\{x<" + w_c + ":\\ 0,\\ x\\ge"+ w_c +":\\ -20\\log\\left(\\frac{x}{" + w_c + "}\\right)\\right\\}" + " + "
-            phase_expression += "\\left\\{x<" + (w_c/10) + ":\\ 0," + (w_c/10) + "\\le x<" + (w_c*10) + ":\\ \\frac{-\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + (w_c/10) + "\\right),\\ x\\ge" + (w_c*10) + ":\\ \\frac{-\\pi}{2}\\right\\}" + " + "
+            magnitude_expression += "\\left\\{x<" + Math.abs(w_c) + ":\\ 0,\\ x\\ge"+ Math.abs(w_c) +":\\ -20\\log\\left(\\frac{x}{" + Math.abs(w_c) + "}\\right)\\right\\}" + " + ";
+            phase_expression += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{2}\\right\\}" + " + ";
         }
     });
     
@@ -127,6 +127,9 @@ function print_bode_plot() {
         if(val == 0) {
             return;
         }
+        if(val < 0) {
+            val *= -1;
+        }
         if(val > max_x) {
             max_x = val;
         }
@@ -138,6 +141,9 @@ function print_bode_plot() {
     function find_y_bound(val) {
         if(val == 0) {
             return [];
+        }
+        if(val < 0) {
+            val *= -1;
         }
         var val_magnitude = calculator_magnitude.HelperExpression({ latex: "g(" + val + ")" });
         var val_phase = calculator_phase.HelperExpression({ latex: "p(" + val + ")" });
