@@ -57,6 +57,8 @@ function print_bode_plot() {
     min_y_phase = Infinity;
 
     var K = values[0];
+    values[1] = values[1].trim();
+    values[2] = values[2].trim();
     var w_c_num = values[1].trim() ? values[1].split(/[,\s]+/) : [];
     var w_c_den = values[2].trim() ? values[2].split(/[,\s]+/) : [];
 
