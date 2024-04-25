@@ -25,13 +25,12 @@ calculator_phase.observe("graphpaperBounds", function () {
 
 function print_bode_plot() {
     const promises = [];
-    const margin = 0.1;
     var values = [];
     for (var i = 1; i <= 3; i++) {
         var value = document.querySelector(".input" + i).value;
         values.push(value);
     }
-    max_x = 0;
+    max_x = -Infinity;
     min_x = Infinity;
     max_y_gain = -Infinity;
     min_y_gain = Infinity;
@@ -149,6 +148,24 @@ function print_bode_plot() {
     promises.push(promise_val_right[1]);
 
     Promise.all(promises).then(() => {
+        var margin = 0.1;
+        if(min_x === Infinity) {
+            min_x = calculator_gain.graphpaperBounds.mathCoordinates.left*100;
+        }
+        if(max_x === -Infinity) {
+            max_x = calculator_gain.graphpaperBounds.mathCoordinates.right/100;
+        }
+        if(min_y_gain == max_y_gain) {
+            min_y_gain = calculator_gain.graphpaperBounds.mathCoordinates.bottom;
+            max_y_gain = calculator_gain.graphpaperBounds.mathCoordinates.top;
+            margin = 0;
+        }
+        if(min_y_phase == max_y_phase) {
+            min_y_phase = calculator_phase.graphpaperBounds.mathCoordinates.bottom;
+            max_y_phase = calculator_phase.graphpaperBounds.mathCoordinates.top;
+            margin = 0;
+        }
+
         calculator_gain.setMathBounds({
             left: min_x/100,
             right: max_x*100,
