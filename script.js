@@ -37,14 +37,28 @@ calculator_phase.observe("graphpaperBounds", function () {
     });
 });
 
-const checkbox = document.querySelector(".angle");
-checkbox.addEventListener("change", function() {
-    const checkboxText = document.querySelector(".angleUnit");
-    if(checkbox.checked) {
-        checkboxText.textContent = "Currently in Degrees";
+const checkbox_angle = document.querySelector(".angle");
+const checkbox_exact = document.querySelector(".exact");
+checkbox_angle.addEventListener("change", function() {
+    print_bode_plot();
+    
+    const checkbox_angle_text = document.querySelector(".angleUnit");
+    if(checkbox_angle.checked) {
+        checkbox_angle_text.textContent = "Currently in Degrees";
     }
     else {
-        checkboxText.textContent = "Currently in Radians";
+        checkbox_angle_text.textContent = "Currently in Radians";
+    }
+});
+checkbox_exact.addEventListener("change", function() {
+    print_bode_plot();
+
+    const checkbox_exact_text = document.querySelector(".exactLabel");
+    if(checkbox_exact.checked) {
+        checkbox_exact_text.textContent = "Exact and Approximate";
+    }
+    else {
+        checkbox_exact_text.textContent = "Approximate";
     }
 });
 
@@ -53,7 +67,6 @@ document.addEventListener("keyup", function(event) {
         print_bode_plot();
     }
 });
-
 
 function print_bode_plot() {
     const promises = [];
@@ -82,23 +95,23 @@ function print_bode_plot() {
     var magnitude_expression_approximation = "g_{approximation}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
     var phase_expression_approximation = "p_{approximation}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
-    var magnitude_expression_actual = "g_{actual}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
-    var phase_expression_actual = "p_{actual}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
+    var magnitude_expression_exact = "g_{exact}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
+    var phase_expression_exact = "p_{exact}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
     w_c_num.forEach(function(w_c) {
         if(w_c == 0) {
             magnitude_expression_approximation += "20\\log(x)" + " + ";
             phase_expression_approximation += "\\frac{\\pi}{2}" + " + ";
 
-            magnitude_expression_actual += "20\\log(x)" + " + ";
-            phase_expression_actual += "\\frac{\\pi}{2}" + " + ";
+            magnitude_expression_exact += "20\\log(x)" + " + ";
+            phase_expression_exact += "\\frac{\\pi}{2}" + " + ";
         }
         else {
             magnitude_expression_approximation += "\\left\\{x<" + Math.abs(w_c) + ":\\ 0,\\ x\\ge"+ Math.abs(w_c) +":\\ 20\\log\\left(\\frac{x}{" + Math.abs(w_c) + "}\\right)\\right\\}" + " + ";
             phase_expression_approximation += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot \\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{" + Math.sign(w_c) + "\\cdot \\pi}{2}\\right\\}" + " + ";
 
-            magnitude_expression_actual += "10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
-            phase_expression_actual += "\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
+            magnitude_expression_exact += "10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
+            phase_expression_exact += "\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
         }
     });
     w_c_den.forEach(function(w_c) {
@@ -106,32 +119,32 @@ function print_bode_plot() {
             magnitude_expression_approximation += "-20\\log(x)" + " + ";
             phase_expression_approximation += "\\frac{-\\pi}{2}" + " + ";
 
-            magnitude_expression_actual += "-20\\log(x)" + " + ";
-            phase_expression_actual += "\\frac{-\\pi}{2}" + " + ";
+            magnitude_expression_exact += "-20\\log(x)" + " + ";
+            phase_expression_exact += "\\frac{-\\pi}{2}" + " + ";
         }
         else {
             magnitude_expression_approximation += "\\left\\{x<" + Math.abs(w_c) + ":\\ 0,\\ x\\ge"+ Math.abs(w_c) +":\\ -20\\log\\left(\\frac{x}{" + Math.abs(w_c) + "}\\right)\\right\\}" + " + ";
             phase_expression_approximation += "\\left\\{x<" + Math.abs(w_c/10) + ":\\ 0," + Math.abs(w_c/10) + "\\le x<" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{4}\\left(\\log\\left(x\\right)-\\log" + Math.abs(w_c/10) + "\\right),\\ x\\ge" + Math.abs(w_c*10) + ":\\ \\frac{"+ Math.sign(w_c) +"\\cdot -\\pi}{2}\\right\\}" + " + ";
 
-            magnitude_expression_actual += "-10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
-            phase_expression_actual += "-\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
+            magnitude_expression_exact += "-10\\log\\left(\\left(x\\cdot" + (1/w_c) + "\\right)^{2}+1\\right)" + " + ";
+            phase_expression_exact += "-\\arctan\\left(\\frac{x}{" + w_c + "}\\right)" + " + ";
         }
     });
     
     magnitude_expression_approximation = magnitude_expression_approximation.substring(0, magnitude_expression_approximation.length - 3);
     phase_expression_approximation = phase_expression_approximation.substring(0, phase_expression_approximation.length - 3);
 
-    magnitude_expression_actual = magnitude_expression_actual.substring(0, magnitude_expression_actual.length - 3);
-    phase_expression_actual = phase_expression_actual.substring(0, phase_expression_actual.length - 3);
+    magnitude_expression_exact = magnitude_expression_exact.substring(0, magnitude_expression_exact.length - 3);
+    phase_expression_exact = phase_expression_exact.substring(0, phase_expression_exact.length - 3);
 
-    if(checkbox.checked) {
+    if(checkbox_angle.checked) {
         var equal_index = phase_expression_approximation.indexOf("=");
         phase_expression_approximation = phase_expression_approximation.slice(0, equal_index + 2) + "(" + phase_expression_approximation.slice(equal_index + 2);
         phase_expression_approximation += ")\\cdot 180 / \\pi";
 
-        equal_index = phase_expression_actual.indexOf("=");
-        phase_expression_actual = phase_expression_actual.slice(0, equal_index + 2) + "(" + phase_expression_actual.slice(equal_index + 2);
-        phase_expression_actual += ")\\cdot 180 / \\pi";
+        equal_index = phase_expression_exact.indexOf("=");
+        phase_expression_exact = phase_expression_exact.slice(0, equal_index + 2) + "(" + phase_expression_exact.slice(equal_index + 2);
+        phase_expression_exact += ")\\cdot 180 / \\pi";
     }
 
     calculator_magnitude.setExpression({
@@ -148,20 +161,30 @@ function print_bode_plot() {
         lineOpacity: 1.0,
         color: Desmos.Colors.BLUE
     });
-    calculator_magnitude.setExpression({
-        id: "magnitude_actual",
-        latex: magnitude_expression_actual,
-        lineStyle: Desmos.Styles.DASHED,
-        lineOpacity: 0.5,
-        color: Desmos.Colors.GREEN
-    });
-    calculator_phase.setExpression({
-        id: "magnitude_actual",
-        latex: phase_expression_actual,
-        lineStyle: Desmos.Styles.DASHED,
-        lineOpacity: 0.5,
-        color: Desmos.Colors.GREEN
-    });
+    if(checkbox_exact.checked) {
+        calculator_magnitude.setExpression({
+            id: "magnitude_exact",
+            latex: magnitude_expression_exact,
+            lineStyle: Desmos.Styles.DASHED,
+            lineOpacity: 0.5,
+            color: Desmos.Colors.GREEN
+        });
+        calculator_phase.setExpression({
+            id: "phase_exact",
+            latex: phase_expression_exact,
+            lineStyle: Desmos.Styles.DASHED,
+            lineOpacity: 0.5,
+            color: Desmos.Colors.GREEN
+        });
+    }
+    else {
+        calculator_magnitude.removeExpression({
+            id: "magnitude_exact"
+        });
+        calculator_phase.removeExpression({
+            id: "phase_exact"
+        });
+    }
 
     function find_x_bound(val) {
         if(val == 0) {
@@ -217,15 +240,15 @@ function print_bode_plot() {
 
         for(var i = 0; i < check.length; i++) {
             var promise_val_approximation = find_y_bound(w_c * check[i], "approximation");
-            var promise_val_actual = find_y_bound(w_c * check[i], "actual");
+            var promise_val_exact = find_y_bound(w_c * check[i], "exact");
 
             if(promise_val_approximation.length != 0) {
                 promises.push(promise_val_approximation[0]);
                 promises.push(promise_val_approximation[1]);
             }
-            if(promise_val_actual.length != 0) {
-                promises.push(promise_val_actual[0]);
-                promises.push(promise_val_actual[1]);
+            if(promise_val_exact.length != 0) {
+                promises.push(promise_val_exact[0]);
+                promises.push(promise_val_exact[1]);
             }
         }
     });
@@ -235,15 +258,15 @@ function print_bode_plot() {
 
         for(var i = 0; i < check.length; i++) {
             var promise_val_approximation = find_y_bound(w_c * check[i], "approximation");
-            var promise_val_actual = find_y_bound(w_c * check[i], "actual");
+            var promise_val_exact = find_y_bound(w_c * check[i], "exact");
 
             if(promise_val_approximation.length != 0) {
                 promises.push(promise_val_approximation[0]);
                 promises.push(promise_val_approximation[1]);
             }
-            if(promise_val_actual.length != 0) {
-                promises.push(promise_val_actual[0]);
-                promises.push(promise_val_actual[1]);
+            if(promise_val_exact.length != 0) {
+                promises.push(promise_val_exact[0]);
+                promises.push(promise_val_exact[1]);
             }
         }
     });
@@ -252,17 +275,17 @@ function print_bode_plot() {
     promises.push(promise_val_left_approximation[0]);
     promises.push(promise_val_left_approximation[1]);
 
-    var promise_val_left_actual = find_y_bound(min_x/100, "actual");
-    promises.push(promise_val_left_actual[0]);
-    promises.push(promise_val_left_actual[1]);
+    var promise_val_left_exact = find_y_bound(min_x/100, "exact");
+    promises.push(promise_val_left_exact[0]);
+    promises.push(promise_val_left_exact[1]);
 
     var promise_val_right_approximation = find_y_bound(max_x*100, "approximation");
     promises.push(promise_val_right_approximation[0]);
     promises.push(promise_val_right_approximation[1]);
 
-    var promise_val_right_actual = find_y_bound(max_x*100, "actual");
-    promises.push(promise_val_right_actual[0]);
-    promises.push(promise_val_right_actual[1]);
+    var promise_val_right_exact = find_y_bound(max_x*100, "exact");
+    promises.push(promise_val_right_exact[0]);
+    promises.push(promise_val_right_exact[1]);
 
     Promise.all(promises).then(() => {
         var margin = 0.1;
