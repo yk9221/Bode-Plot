@@ -92,10 +92,10 @@ function print_bode_plot() {
     var w_c_num = values[1].trim() ? values[1].match(/(?:\[.*?\]|[^,\s]+)/g) : [];
     var w_c_den = values[2].trim() ? values[2].match(/(?:\[.*?\]|[^,\s]+)/g) : [];
 
-    var magnitude_expression_approximation = "g_{approximation}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
+    var magnitude_expression_approximation = "g_{approximation}(x) = " + 20 * Math.log10(Math.abs(K)) + " + ";
     var phase_expression_approximation = "p_{approximation}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
-    var magnitude_expression_exact = "g_{exact}(x) = " + Math.round(20 * Math.log10(Math.abs(K)), 2) + " + ";
+    var magnitude_expression_exact = "g_{exact}(x) = " + 20 * Math.log10(Math.abs(K)) + " + ";
     var phase_expression_exact = "p_{exact}(x) = " + (K > 0 ? "0" : "-\\pi") + " + ";
 
     w_c_num.forEach(function(w_c) {
