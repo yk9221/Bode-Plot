@@ -142,7 +142,6 @@ function print_bode_plot() {
             
             magnitude_expression_exact += "-10\\log\\left(\\left(1-\\frac{x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)^{2}+\\frac{4\\left(" + zeta + "\\right)^{2}x^{2}}{\\left(" + w_n + "\\right)^{2}}\\right)" + " + ";
             phase_expression_exact += "\\left\\{0\\le x\\le" + w_n + "\\ :\\ -\\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + (w_n) + "^{2}}}\\right),\\ x>" + w_n + "\\ :\\ -\\left(\\arctan\\left(\\frac{\\frac{2x \\cdot" + zeta + "}{" + w_n + "}}{1-\\frac{x^{2}}{" + w_n + "^{2}}}\\right)+\\pi\\right)\\right\\}" + " + ";
-            console.log(phase_expression_exact)
         }
         else if(w_c == 0) {
             magnitude_expression_approximation += "-20\\log(x)" + " + ";
@@ -252,7 +251,6 @@ function print_bode_plot() {
         });
         const promise_phase = new Promise(resolve => {
             val_phase.observe("numericValue", function() {
-                console.log(val, val_phase.numericValue);
                 if(val_phase.numericValue > max_y_phase) {
                     max_y_phase = val_phase.numericValue;
                 }
@@ -330,7 +328,6 @@ function print_bode_plot() {
     promises.push(promise_val_right_exact[1]);
 
     Promise.all(promises).then(() => {
-        console.log(min_y_phase, max_y_phase)
         var margin = 0.1;
         if(min_x === Infinity) {
             min_x = calculator_magnitude.graphpaperBounds.mathCoordinates.left*100;
