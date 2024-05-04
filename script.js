@@ -52,10 +52,10 @@ checkbox_angle.addEventListener("change", function() {
 
     const checkbox_angle_text = document.querySelector(".angleUnit");
     if(checkbox_angle.checked) {
-        checkbox_angle_text.textContent = "Currently in Degrees";
+        checkbox_angle_text.textContent = "Currently in Radians";
     }
     else {
-        checkbox_angle_text.textContent = "Currently in Radians";
+        checkbox_angle_text.textContent = "Currently in Degrees";
     }
 });
 checkbox_exact.addEventListener("change", function() {
@@ -190,7 +190,7 @@ function print_bode_plot() {
     magnitude_expression_exact = magnitude_expression_exact.substring(0, magnitude_expression_exact.length - 3);
     phase_expression_exact = phase_expression_exact.substring(0, phase_expression_exact.length - 3);
 
-    if(checkbox_angle.checked) {
+    if(!checkbox_angle.checked) {
         var equal_index = phase_expression_approximation.indexOf("=");
         phase_expression_approximation = phase_expression_approximation.slice(0, equal_index + 2) + "(" + phase_expression_approximation.slice(equal_index + 2);
         phase_expression_approximation += ")\\cdot 180 / \\pi";
@@ -232,12 +232,12 @@ function print_bode_plot() {
                 if(Math.abs(w_c_approximation_check.numericValue) < tolerance) {
                     calculator_phase.setExpression({
                         id: "phase_margin_approximation",
-                        latex: "P_{Ma} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\pi+" + Number(checkbox_angle.checked) + "\\cdot 180 + p_{approximation}(" + w_c_approximation.numericValue + ")",
+                        latex: "P_{Ma} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot 180+" + Number(checkbox_angle.checked) + "\\cdot\\pi + p_{approximation}(" + w_c_approximation.numericValue + ")",
                     });
                     var p_m_approximation = calculator_phase.HelperExpression({ latex: "P_{Ma}" });
                     p_m_approximation.observe("numericValue", function() {
                         label_phase_margin_approximation.textContent = Math.round(p_m_approximation.numericValue * 100) / 100;
-                        if(checkbox_angle.checked) {
+                        if(!checkbox_angle.checked) {
                             label_phase_margin_approximation.textContent += "°";
                         }
                         else {
@@ -252,13 +252,13 @@ function print_bode_plot() {
 
         calculator_phase.setExpression({
             id: "w_c_approximation",
-            latex: "p_{approximation}(w_{180a})\\left\\{w_{180a}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-\\pi\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-180\\right)"
+            latex: "p_{approximation}(w_{180a})\\left\\{w_{180a}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-180\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-\\pi\\right)"
         });
         var w_180_approximation = calculator_phase.HelperExpression({ latex: "w_{180a}" });
         w_180_approximation.observe("numericValue", function() {
             var w_180_approximation_check = calculator_phase.HelperExpression({ latex: "p_{approximation}(" + w_180_approximation.numericValue + ")" });
             w_180_approximation_check.observe("numericValue", function() {
-                if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_approximation_check.numericValue) < tolerance && w_180_approximation.numericValue < Math.pow(10, 8)) {
+                if((1 - Number(checkbox_angle.checked)) * 180 + Number(checkbox_angle.checked) * (Math.PI) - Math.abs(w_180_approximation_check.numericValue) < tolerance && w_180_approximation.numericValue < Math.pow(10, 8)) {
                     calculator_magnitude.setExpression({
                         id: "gain_margin_approximation",
                         latex: "G_{Ma} = g_{approximation}(" + w_180_approximation.numericValue + ")",
@@ -288,12 +288,12 @@ function print_bode_plot() {
                     if(Math.abs(w_c_exact_check.numericValue) < tolerance) {
                         calculator_phase.setExpression({
                             id: "phase_margin_exact",
-                            latex: "P_{Me} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\pi+" + Number(checkbox_angle.checked) + "\\cdot 180 + p_{exact}(" + w_c_exact.numericValue + ")",
+                            latex: "P_{Me} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot 180+" + Number(checkbox_angle.checked) + "\\cdot\\pi + p_{exact}(" + w_c_exact.numericValue + ")",
                         });
                         var p_m_exact = calculator_phase.HelperExpression({ latex: "P_{Me}" });
                         p_m_exact.observe("numericValue", function() {
                             label_phase_margin_exact.textContent = Math.round(p_m_exact.numericValue * 100) / 100;
-                            if(checkbox_angle.checked) {
+                            if(!checkbox_angle.checked) {
                                 label_phase_margin_exact.textContent += "°";
                             }
                             else {
@@ -308,13 +308,13 @@ function print_bode_plot() {
     
             calculator_phase.setExpression({
                 id: "w_c_exact",
-                latex: "p_{exact}(w_{180e})\\left\\{w_{180e}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-\\pi\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-180\\right)"
+                latex: "p_{exact}(w_{180e})\\left\\{w_{180e}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-180\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-\\pi\\right)"
             });
             var w_180_exact = calculator_phase.HelperExpression({ latex: "w_{180e}" });
             w_180_exact.observe("numericValue", function() {
                 var w_180_exact_check = calculator_phase.HelperExpression({ latex: "p_{exact}(" + w_180_exact.numericValue + ")" });
                 w_180_exact_check.observe("numericValue", function() {
-                    if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_exact_check.numericValue) < tolerance && w_180_exact.numericValue < Math.pow(10, 8)) {
+                    if((1 - Number(checkbox_angle.checked)) * 180 + Number(checkbox_angle.checked) * (Math.PI) - Math.abs(w_180_exact_check.numericValue) < tolerance && w_180_exact.numericValue < Math.pow(10, 8)) {
                         calculator_magnitude.setExpression({
                             id: "gain_margin_exact",
                             latex: "G_{Me} = g_{exact}(" + w_180_exact.numericValue + ")",
