@@ -1,12 +1,12 @@
 var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {
     expressionsCollapsed: true,
-    expressions: false,
+    // expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
     expressionsCollapsed: true,
-    expressions: false,
+    // expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
@@ -39,9 +39,16 @@ calculator_phase.observe("graphpaperBounds", function() {
 
 const checkbox_angle = document.querySelector(".angle");
 const checkbox_exact = document.querySelector(".exact");
+const checkbox_margin = document.querySelector(".stabilityMargin");
+const margin_div = document.querySelector(".margins");
+const exact_margins = document.querySelectorAll(".exactMargins");
+
+var graph_click_count = 0;
 
 checkbox_angle.addEventListener("change", function() {
-    print_bode_plot();
+    if(graph_click_count > 0) {
+        print_bode_plot();
+    }
 
     const checkbox_angle_text = document.querySelector(".angleUnit");
     if(checkbox_angle.checked) {
@@ -52,14 +59,30 @@ checkbox_angle.addEventListener("change", function() {
     }
 });
 checkbox_exact.addEventListener("change", function() {
-    print_bode_plot();
+    if(graph_click_count > 0) {
+        print_bode_plot();
+    }
 
     const checkbox_exact_text = document.querySelector(".exactLabel");
     if(checkbox_exact.checked) {
         checkbox_exact_text.textContent = "Exact and Approximate";
+        exact_margins.forEach(element => {
+            element.style.display = 'block';
+        });
     }
     else {
         checkbox_exact_text.textContent = "Approximate";
+        exact_margins.forEach(element => {
+            element.style.display = 'none';
+        });
+    }
+});
+checkbox_margin.addEventListener("change", function() {
+    if(checkbox_margin.checked) {
+        margin_div.style.display = "block";
+    }
+    else {
+        margin_div.style.display = "none";
     }
 });
 document.addEventListener("keyup", function(event) {
@@ -69,6 +92,8 @@ document.addEventListener("keyup", function(event) {
 });
 
 function print_bode_plot() {
+    graph_click_count++;
+
     const promises = [];
     const check = [0.1, Math.pow(10, -0.5), 1, Math.pow(10, 0.5), 10];
     var values = [];
@@ -189,6 +214,125 @@ function print_bode_plot() {
         lineOpacity: 1.0,
         color: Desmos.Colors.BLUE
     });
+    if(checkbox_margin.checked) {
+        const label_phase_margin_approximation = document.querySelector(".phaseMarginApproximation");
+        const label_gain_margin_approximation = document.querySelector(".gainMarginApproximation");
+        const label_phase_margin_exact = document.querySelector(".phaseMarginExact");
+        const label_gain_margin_exact = document.querySelector(".gainMarginExact");
+        const tolerance = 1e-10;
+
+        calculator_magnitude.setExpression({
+            id: "w_c_approximation",
+            latex: "g_{approximation}(w_{ca})\\left\\{w_{ca}>0\\right\\}\\sim 0",
+        });
+        var w_c_approximation = calculator_magnitude.HelperExpression({ latex: "w_{ca}" });
+        w_c_approximation.observe("numericValue", function() {
+            var w_c_approximation_check = calculator_magnitude.HelperExpression({ latex: "g_{approximation}(" + w_c_approximation.numericValue + ")" });
+            w_c_approximation_check.observe("numericValue", function() {
+                if(Math.abs(w_c_approximation_check.numericValue) < tolerance) {
+                    calculator_phase.setExpression({
+                        id: "phase_margin_approximation",
+                        latex: "P_{Ma} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\pi+" + Number(checkbox_angle.checked) + "\\cdot 180 + p_{approximation}(" + w_c_approximation.numericValue + ")",
+                    });
+                    var p_m_approximation = calculator_phase.HelperExpression({ latex: "P_{Ma}" });
+                    p_m_approximation.observe("numericValue", function() {
+                        label_phase_margin_approximation.textContent = Math.round(p_m_approximation.numericValue * 100) / 100;
+                        if(checkbox_angle.checked) {
+                            label_phase_margin_approximation.textContent += "°";
+                        }
+                        else {
+                            label_phase_margin_approximation.textContent += " rad";
+                        }
+                        label_phase_margin_approximation.textContent += " (at " + Math.round(w_c_approximation.numericValue * 100) / 100 + " rad/s)"
+                    });
+                }
+            });
+        });
+
+
+        calculator_phase.setExpression({
+            id: "w_c_approximation",
+            latex: "p_{approximation}(w_{180a})\\left\\{w_{180a}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-\\pi\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-180\\right)"
+        });
+        var w_180_approximation = calculator_phase.HelperExpression({ latex: "w_{180a}" });
+        w_180_approximation.observe("numericValue", function() {
+            var w_180_approximation_check = calculator_phase.HelperExpression({ latex: "p_{approximation}(" + w_180_approximation.numericValue + ")" });
+            w_180_approximation_check.observe("numericValue", function() {
+                if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_approximation_check.numericValue) < tolerance) {
+                    calculator_magnitude.setExpression({
+                        id: "gain_margin_approximation",
+                        latex: "G_{Ma} = g_{approximation}(" + w_180_approximation.numericValue + ")",
+                    });
+                    var g_m_approximation = calculator_magnitude.HelperExpression({ latex: "G_{Ma}" });
+                    g_m_approximation.observe("numericValue", function() {
+                        label_gain_margin_approximation.textContent = 0 - Math.round(g_m_approximation.numericValue * 100) / 100;
+                        label_gain_margin_approximation.textContent += " dB";
+                        label_gain_margin_approximation.textContent += " (at " + Math.round(w_180_approximation.numericValue * 100) / 100 + " rad/s)"
+                    });
+                }
+                else {
+                    label_gain_margin_approximation.textContent = "∞";
+                }
+            });
+        });
+
+        if(checkbox_exact.checked) {
+            calculator_magnitude.setExpression({
+                id: "w_c_exact",
+                latex: "g_{exact}(w_{ce})\\left\\{w_{ce}>0\\right\\}\\sim 0",
+            });
+            var w_c_exact = calculator_magnitude.HelperExpression({ latex: "w_{ce}" });
+            w_c_exact.observe("numericValue", function() {
+                var w_c_exact_check = calculator_magnitude.HelperExpression({ latex: "g_{exact}(" + w_c_exact.numericValue + ")" });
+                w_c_exact_check.observe("numericValue", function() {
+                    if(Math.abs(w_c_exact_check.numericValue) < tolerance) {
+                        calculator_phase.setExpression({
+                            id: "phase_margin_exact",
+                            latex: "P_{Me} = \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\pi+" + Number(checkbox_angle.checked) + "\\cdot 180 + p_{exact}(" + w_c_exact.numericValue + ")",
+                        });
+                        var p_m_exact = calculator_phase.HelperExpression({ latex: "P_{Me}" });
+                        p_m_exact.observe("numericValue", function() {
+                            label_phase_margin_exact.textContent = Math.round(p_m_exact.numericValue * 100) / 100;
+                            if(checkbox_angle.checked) {
+                                label_phase_margin_exact.textContent += "°";
+                            }
+                            else {
+                                label_phase_margin_exact.textContent += " rad";
+                            }
+                            label_phase_margin_exact.textContent += " (at " + Math.round(w_c_exact.numericValue * 100) / 100 + " rad/s)"
+                        });
+                    }
+                });
+            });
+    
+    
+            calculator_phase.setExpression({
+                id: "w_c_exact",
+                latex: "p_{exact}(w_{180e})\\left\\{w_{180e}>0\\right\\}\\sim \\left(1-" + Number(checkbox_angle.checked) + "\\right)\\cdot\\left(-\\pi\\right)+" + Number(checkbox_angle.checked) + "\\cdot\\left(-180\\right)"
+            });
+            var w_180_exact = calculator_phase.HelperExpression({ latex: "w_{180e}" });
+            w_180_exact.observe("numericValue", function() {
+                var w_180_exact_check = calculator_phase.HelperExpression({ latex: "p_{exact}(" + w_180_exact.numericValue + ")" });
+                w_180_exact_check.observe("numericValue", function() {
+                    if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_exact_check.numericValue) < tolerance && w_180_exact_check.numericValue > Math.pow(10, 10)) {
+                        calculator_magnitude.setExpression({
+                            id: "gain_margin_exact",
+                            latex: "G_{Me} = g_{exact}(" + w_180_exact.numericValue + ")",
+                        });
+                        var g_m_exact = calculator_magnitude.HelperExpression({ latex: "G_{Me}" });
+                        g_m_exact.observe("numericValue", function() {
+                            label_gain_margin_exact.textContent = 0 - Math.round(g_m_exact.numericValue * 100) / 100;
+                            label_gain_margin_exact.textContent += " dB";
+                            label_gain_margin_exact.textContent += " (at " + Math.round(w_180_exact.numericValue * 100) / 100 + " rad/s)"
+                        });
+                    }
+                    else {
+                        label_gain_margin_exact.textContent = "∞";
+                    }
+                });
+            });
+        }
+    }
     if(checkbox_exact.checked) {
         calculator_magnitude.setExpression({
             id: "magnitude_exact",

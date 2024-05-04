@@ -32,7 +32,31 @@
             <input type="checkbox" class="exact" checked>
             <label for="exact" class="exactLabel">Exact and Approximate</label>
         </div>
-        <button class="graph" onclick="print_bode_plot()">Graph Bode Plot</button>
+        <div>
+            <input type="checkbox" class="stabilityMargin" checked>
+            <label for="stabilityMargin">Stability Margins</label>
+        </div>
+        <div>
+            <button class="graph" onclick="print_bode_plot()">Graph Bode Plot</button>
+        </div>
+        <div class="margins">
+            <div>
+                <b><label>Phase Margin Approximation: </label></b><br>
+                <label class="phaseMarginApproximation"></label><br>
+            </div>
+            <div>
+                <b><label>Gain Margin Approximation: </label></b><br>
+                <label class="gainMarginApproximation"></label><br>
+            </div>
+            <div class="exactMargins">
+                <b><label>Phase Margin Exact: </label></b><br>
+                <label class="phaseMarginExact"></label><br>
+            </div>
+            <div class="exactMargins">
+                <b><label>Gain Margin Exact: </label></b><br>
+                <label class="gainMarginExact"></label><br>
+            </div>
+        </div>
     </div>
     <div class="calculators">
         <div class="calculator_magnitude"><p><strong>Magnitude</strong></p></div>
