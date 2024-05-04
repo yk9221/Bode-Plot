@@ -1,12 +1,12 @@
 var calculator_magnitude = Desmos.GraphingCalculator(document.querySelector(".calculator_magnitude"), {
     expressionsCollapsed: true,
-    // expressions: false,
+    expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
 var calculator_phase = Desmos.GraphingCalculator(document.querySelector(".calculator_phase"), {
     expressionsCollapsed: true,
-    // expressions: false,
+    expressions: false,
     settingsMenu: false,
     zoomButtons: false
 });
@@ -258,7 +258,7 @@ function print_bode_plot() {
         w_180_approximation.observe("numericValue", function() {
             var w_180_approximation_check = calculator_phase.HelperExpression({ latex: "p_{approximation}(" + w_180_approximation.numericValue + ")" });
             w_180_approximation_check.observe("numericValue", function() {
-                if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_approximation_check.numericValue) < tolerance) {
+                if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_approximation_check.numericValue) < tolerance && w_180_approximation_check.numericValue > Math.pow(10, 8)) {
                     calculator_magnitude.setExpression({
                         id: "gain_margin_approximation",
                         latex: "G_{Ma} = g_{approximation}(" + w_180_approximation.numericValue + ")",
@@ -314,7 +314,7 @@ function print_bode_plot() {
             w_180_exact.observe("numericValue", function() {
                 var w_180_exact_check = calculator_phase.HelperExpression({ latex: "p_{exact}(" + w_180_exact.numericValue + ")" });
                 w_180_exact_check.observe("numericValue", function() {
-                    if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_exact_check.numericValue) < tolerance && w_180_exact_check.numericValue > Math.pow(10, 10)) {
+                    if((1 - Number(checkbox_angle.checked)) * (Math.PI) + Number(checkbox_angle.checked) * 180 - Math.abs(w_180_exact_check.numericValue) < tolerance && w_180_exact_check.numericValue > Math.pow(10, 8)) {
                         calculator_magnitude.setExpression({
                             id: "gain_margin_exact",
                             latex: "G_{Me} = g_{exact}(" + w_180_exact.numericValue + ")",
