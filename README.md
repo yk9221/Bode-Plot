@@ -1,6 +1,6 @@
 # Bode Plot
 ## Overview
-This web application allows users to input transfer functions, compute their frequency responses, and visualize both magnitude (in dB) and phase plots using Desmos.
+This web application allows users to input transfer functions and visualize both magnitude (in dB) and phase plots using the Desmos API.
 
 ## Usage
 1. The website is deployed here: [Bode Plot](https://yk9221.github.io/Bode-Plot/)
