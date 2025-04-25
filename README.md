@@ -9,7 +9,7 @@ This web application allows users to input transfer functions, compute their fre
 4. This will output the phase (in dB) and magnitude plots along with the gain and phase margins
 
 ## Example
-![Bode Plot](BodePlot.png)
+![Bode Plot](Bode_plot.png)
 This is an example of the Bode plot:
 
 $$
