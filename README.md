@@ -6,7 +6,8 @@ This web application allows users to input transfer functions, compute their fre
 1. The website is deployed here: [Bode Plot](https://yk9221.github.io/Bode-Plot/)
 2. Input the constant, then the corner frequencies in the numerator and denominator
 3. Press Enter or click on the button to draw
-4. This will output the phase (in dB) and magnitude plots along with the gain and phase margins
+4. This will output the magnitude (in dB) and phase plots along with the gain and phase margins
+5. The blue solid line represents the approximated Bode plot, while the green dotted line shows the actual Bode plot
 
 ## Example
 ![Bode Plot](Bode_plot.png)
